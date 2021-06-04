@@ -37,4 +37,4 @@ if [ ! -f split_read_parsed_interleaved.fq ]
 then
     cat $prefix.corrected.interleaved.fq | paste -d '\t' - - - - - - - - | awk '{if($2 ~ /BX/){printf("%s\t%s\n",$2,$0);}else{printf("Z\t%s\n",$0);}}' | LANG=C sort -t $'\t' -k1,1 -T temp/ | cut -f 2- | tr "\t" "\n" > split_read_parsed_interleaved.fq
 fi
-rm -r temp $prefix.corrected.interleaved.fq $prefix.corrected_1.fq $prefix.corrected_2.fq reads1.fq reads2.fq $prefix_bc*
+rm -r temp $prefix.corrected.interleaved.fq $prefix.corrected_1.fq $prefix.corrected_2.fq reads1.fq reads2.fq "$prefix"_bc*
