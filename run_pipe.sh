@@ -1,13 +1,15 @@
+#!/bin/bash
 ## requirements
 # perl
 # libz
-# spades
+# megahit
 # bwa
 # samtools
 # athena-meta
+# seqtk
 
 ## usage
-# bash run_pipe.sh <path_to_stlfr_read1> <path_to_stlfr_read2> <number_of_threads> <memory_limit_for_spades> <path_to_stLFR_Pipe_folder> <output_dir>
+# bash run_pipe.sh <path_to_stlfr_read1> <path_to_stlfr_read2> <number_of_threads> <path_to_stLFR_Pipe_folder> <output_dir> <barcode_type>
 
 ## pipe init
 set -e
@@ -20,35 +22,55 @@ case $2 in
   *) read2=$PWD/$2;;
 esac
 thread=$3
-memory=$4
+case $4 in
+  /*) script_dir=$4;;
+  *) script_dir=$PWD/$4;;
+esac
 case $5 in
-  /*) script_dir=$5;;
-  *) script_dir=$PWD/$5;;
+  /*) out_dir=$5;;
+  *) out_dir=$PWD/$5;;
 esac
-case $6 in
-  /*) out_dir=$6;;
-  *) out_dir=$PWD/$6;;
-esac
+type_bc=$6
 
 # step 0 enter output_dir
 if [ ! -d "$out_dir" ]
 then
     mkdir $out_dir
 fi
-rm -rf $out_dir/*
 cd $out_dir
 
-# step 1 stLFR_read_demux
-perl $script_dir/stLFR_read_demux/scripts/split_barcode_PEXXX_42_reads.1.pl $script_dir/stLFR_read_demux/scripts/barcode.list $script_dir/stLFR_read_demux/scripts/barcode_RC.list $read1 $read2 100 $out_dir/split_read
-perl $script_dir/stLFR_read_demux/scripts/split_barcode_PEXXX_42_reads.2.pl $script_dir/stLFR_read_demux/scripts/barcode.list $script_dir/stLFR_read_demux/scripts/barcode_RC.list $read1 $read2 100 $out_dir/split_read
-
 # step 2 transform barcode
-$script_dir/cpp_tools/parse_stlfr -1 $out_dir/split_read.1.fq.gz -2 $out_dir/split_read.2.fq.gz -l -b $script_dir/stLFR_read_demux/scripts/barcode.list -o $out_dir/split_read_parsed
+if [ ! -f "$out_dir/split_read_parsed_interleaved.fq" ]
+then
+    $script_dir/correct_barcode_stlfr.sh $read1 $read2 $script_dir/data/white_list_stlfr_barcode.fa split $thread $script_dir $type_bc
+fi
 
-# step 3 metaspades
-metaspades.py --12 $out_dir/split_read_parsed_interleaved.fq -m $memory -t $thread -o $out_dir/metaspades --disable-gzip-output
+# step 3 megahit
+if [ ! -d "$out_dir/megahit" ]
+then
+    megahit --12 $out_dir/split_read_parsed_interleaved.fq -t $thread -m 0.99 -o $out_dir/megahit
+fi
 
 # step 4 athena-meta
-cp -r $script_dir/athena ./
+if [ ! -d "$out_dir/athena" ]
+then
+    mkdir athena
+fi
 cd athena
+echo 'thread=$1' > athena.sh
+if [ ! -f "align-reads.megahit-contigs.bam" ]
+then
+    echo 'bwa index ../megahit/final.contigs.fa' >> athena.sh
+    echo 'bwa mem -t $thread -C -p ../megahit/final.contigs.fa ../split_read_parsed_interleaved.fq | samtools sort -@ $thread -o align-reads.megahit-contigs.bam' >> athena.sh
+    echo 'samtools index -@ $thread align-reads.megahit-contigs.bam' >> athena.sh
+fi
+echo 'athena-meta --config config.json' >> athena.sh
+echo '{' > config.json
+echo '  "ctgfasta_path" :      "../megahit/final.contigs.fa",' >> config.json
+echo '  "reads_ctg_bam_path" : "align-reads.megahit-contigs.bam",' >> config.json
+echo '  "input_fqs" :          "../split_read_parsed_interleaved.fq",' >> config.json
+echo '  "cluster_settings": {' >> config.json
+echo '      "cluster_type": "multiprocessing",' >> config.json
+echo '      "processes": '"$(($thread/3))" >> config.json
+echo '}' >> config.json
 bash athena.sh $thread
