@@ -1,9 +1,0 @@
-{
-	"ctgfasta_path" :      "../metaspades/contigs.fasta",
-	"reads_ctg_bam_path" : "align-reads.metaspades-contigs.bam",
-	"input_fqs" :          "../split_read_parsed_interleaved.fq",
-	"cluster_settings": {
-		"cluster_type": "multiprocessing",
-		"processes": 24
-	}						
-}
