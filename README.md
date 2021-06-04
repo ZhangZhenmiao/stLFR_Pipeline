@@ -7,6 +7,7 @@
 * [bwa](https://github.com/lh3/bwa)
 * [samtools](https://github.com/samtools/samtools) (tested v1.9)
 * [athena-meta](https://github.com/abishara/athena_meta)
+* [gcc](https://gcc.gnu.org/) (C++11)
 
 ## Install
 `git clone https://github.com/ZhangZhenmiao/stLFR_Pipe.git && cd stLFR_Pipe && make && chmod +x *.sh *.py`
