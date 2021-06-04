@@ -1,7 +1,6 @@
 # stLFR_Pipe
 
 ## Requirements
-* [zlib](https://zlib.net/)
 * [htslib](https://github.com/samtools/htslib)
 * [seqtk](https://github.com/lh3/seqtk)
 * [megahit](https://github.com/voutcn/megahit)
