@@ -72,5 +72,6 @@ echo '  "input_fqs" :          "../split_read_parsed_interleaved.fq",' >> config
 echo '  "cluster_settings": {' >> config.json
 echo '      "cluster_type": "multiprocessing",' >> config.json
 echo '      "processes": '"$(($thread/3))" >> config.json
+echo '  }' >> config.json
 echo '}' >> config.json
 bash athena.sh $thread
