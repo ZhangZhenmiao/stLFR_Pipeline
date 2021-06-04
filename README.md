@@ -9,7 +9,7 @@
 * [athena-meta](https://github.com/abishara/athena_meta)
 
 ## Install
-`git clone https://github.com/ZhangZhenmiao/stLFR_Pipe.git && cd stLFR_Pipe && make && chmod +x *.sh`
+`git clone https://github.com/ZhangZhenmiao/stLFR_Pipe.git && cd stLFR_Pipe && make && chmod +x *`
 
 ## Usage
 `bash run_pipe.sh <path_to_stlfr_read1> <path_to_stlfr_read2> <number_of_threads> <path_to_stLFR_Pipe_folder> <output_dir> <barcode_type, i.e., 30/42/54>`
