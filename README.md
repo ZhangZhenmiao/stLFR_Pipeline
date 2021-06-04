@@ -5,7 +5,7 @@
 * [seqtk](https://github.com/lh3/seqtk)
 * [megahit](https://github.com/voutcn/megahit)
 * [bwa](https://github.com/lh3/bwa)
-* [samtools](https://github.com/samtools/samtools)
+* [samtools](https://github.com/samtools/samtools) (tested v1.9)
 * [athena-meta](https://github.com/abishara/athena_meta)
 
 ## Install
