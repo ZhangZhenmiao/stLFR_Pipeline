@@ -9,7 +9,7 @@ def main(argv):
     outbc1 = argv[2] + "_bc1.fq"
     outbc2 = argv[2] + "_bc2.fq"
     outbc3 = argv[2] + "_bc3.fq"
-    type_bc = int(argv[3])
+    type_bc = argv[3]
 
     bc1 = open(outbc1, "w")
     bc2 = open(outbc2, "w")
