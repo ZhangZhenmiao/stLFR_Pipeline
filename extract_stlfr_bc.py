@@ -5,19 +5,16 @@ import sys
 
 def main(argv):
     inFile = argv[1]
-    outFile = argv[2] + "_reads_only.fq"
     outbc1 = argv[2] + "_bc1.fq"
     outbc2 = argv[2] + "_bc2.fq"
     outbc3 = argv[2] + "_bc3.fq"
     type_bc = argv[3]
-
     bc1 = open(outbc1, "w")
     bc2 = open(outbc2, "w")
     bc3 = open(outbc3, "w")
 
-    lfr_read2 = open(outFile, "w")
     count = 0
-    with open(inFile, "rt") as read2:
+    with gzip.open(inFile, "rt") as read2:
 
         for line in read2:
             count += 1
@@ -40,13 +37,10 @@ def main(argv):
                 bc1.write(b1)
                 bc2.write(b2)
                 bc3.write(b3)
-                bases = line[:100] + "\n"
-                lfr_read2.write(bases)
             else:
                 bc1.write(line)
                 bc2.write(line)
                 bc3.write(line)
-                lfr_read2.write(line)
     bc1.close()
     bc2.close()
     bc3.close()
