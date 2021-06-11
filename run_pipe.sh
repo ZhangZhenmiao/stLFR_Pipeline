@@ -45,7 +45,7 @@ then
     correct_barcode_stlfr.sh $read1 $read2 $script_dir/white_list_stlfr_barcode.fa split $type_bc $thread 0
 fi
 
-if [ ! -f "$out_dir/split_read_parsed_interleaved.fq"]
+if [ ! -f "$out_dir/split_read_parsed_interleaved.fq" ]
 then
   seqtk mergepe $out_dir/split.corrected.sorted_1.fq $out_dir/split.corrected.sorted_2.fq > $out_dir/split_read_parsed_interleaved.fq
 fi
