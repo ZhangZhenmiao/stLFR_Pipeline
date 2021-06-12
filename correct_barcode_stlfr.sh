@@ -17,10 +17,11 @@ rm "$prefix"_bc1.fq "$prefix"_bc2.fq "$prefix"_bc3.fq "$prefix"_bc1.fq.sai "$pre
 correct_barcode_stlfr $whitelist "$prefix"_bc1_aln.sam "$prefix"_bc2_aln.sam "$prefix"_bc3_aln.sam $reads1 $reads2 2 $prefix.corrected_1.fq $prefix.corrected_2.fq
 rm "$prefix"_bc1_aln.sam "$prefix"_bc2_aln.sam "$prefix"_bc3_aln.sam
 
-awk '{printf("%s%s",$0,(NR%4==0)?"\n":"\0")}' "$prefix".corrected_1.fq | LANG=C sort -s -k 2,2 --parallel 10 -S 500m | tr "\0" "\n" > "$prefix".corrected.sorted_1.fq &
-awk '{printf("%s%s",$0,(NR%4==0)?"\n":"\0")}' "$prefix".corrected_2.fq | LANG=C sort -s -k 2,2 --parallel 10 -S 500m | tr "\0" "\n" > "$prefix".corrected.sorted_2.fq &
+mkdir tmp_sort
+cat "$prefix".corrected_1.fq | paste -d '\t' - - - - | awk '{if($2 ~ /BX/){printf("%s\t%s\n",$2,$0);}else{printf("Z\t%s\n",$0);}}' | sort -T tmp_sort -t $'\t' -s -k1,1 | cut -f 2- | tr "\t" "\n" > "$prefix".corrected.sorted_1.fq &
+cat "$prefix".corrected_2.fq | paste -d '\t' - - - - | awk '{if($2 ~ /BX/){printf("%s\t%s\n",$2,$0);}else{printf("Z\t%s\n",$0);}}' | sort -T tmp_sort -t $'\t' -s -k1,1 | cut -f 2- | tr "\t" "\n" > "$prefix".corrected.sorted_2.fq &
 wait
-rm "$prefix".corrected_1.fq "$prefix".corrected_2.fq
+rm -r "$prefix".corrected_1.fq "$prefix".corrected_2.fq tmp_sort
 
 if [ $compress = "1" ]
 then
